@@ -10,7 +10,6 @@ function App() {
   const stockRef = useRef();
   const catIdRef = useRef();
   const isActiveRef = useRef();
-  const summString = null;
   const [isUsd, setUsd] = useState(false);
 
   useEffect(() => {
@@ -26,10 +25,17 @@ function App() {
   }
 
   function tellida(index) {
-    let summString = products[index].price.toString();
-    fetch("https://localhost:7049/api/Products/pay/" + summString, {"method": "GET"})
+    fetch("https://localhost:7049/api/Products/pay/" + index, {"method": "GET"})
       .then(res => res.json())
-      .then(json => setProducts(json));
+      .then(json => 
+        {
+          const url = json.url;
+
+          window.open(url, '_blank');
+        
+          setProducts(json);
+        }
+        );
   }
 
   function lisa() {
@@ -94,7 +100,7 @@ function App() {
           <td>{product.categoryId}</td>
           <td>{product.image}</td>
           <td><button onClick={() => kustuta(index)}>x</button></td>
-          <td><button onClick={() => tellida(index)}>Pay</button></td>
+          <td><button onClick={() => tellida(product.price.toFixed(2))}>Pay</button></td>
         </table>)}
     </div>
   );
