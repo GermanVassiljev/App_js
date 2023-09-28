@@ -23,19 +23,20 @@ function App() {
       .then(res => res.json())
       .then(json => setProducts(json));
   }
+  async function tellida(summ, index) {
+    try {
+      const response = await fetch(`https://localhost:7049/api/Products/pay/${summ}/${index}`);
+      if (response.ok) {
+        let payLink = await response.text();
 
-  function tellida(index) {
-    fetch("https://localhost:7049/api/Products/pay/" + index, {"method": "GET"})
-      .then(res => res.json())
-      .then(json => 
-        {
-          const url = json.url;
-
-          window.open(url, '_blank');
-        
-          setProducts(json);
-        }
-        );
+        payLink = payLink.replace(/^"|"$/g, '');
+        window.open(payLink, '_blank');
+      } else {
+        console.error('Payment failed.');
+      }
+    } catch (error) {
+      console.error('Error making payment:', error);
+    }
   }
 
   function lisa() {
@@ -76,13 +77,13 @@ function App() {
       <input ref={catIdRef} type="number" /> <br />
       <label>Active</label> <br />
       <input ref={isActiveRef} type="checkbox" /> <br />
-      <button onClick={() => lisa()}>Lisa</button>
+      <button onClick={() => lisa()} id='Lisa'>Lisa</button>
       <br/>
-      {isUsd === false && <button onClick={() => dollariteks()}>Muuda dollariteks</button>}
-      {isUsd === true && <button onClick={() => eurodeks()}>Muuda eurodeks</button>}
-      {products.map((product, index) => 
-        <table>
-          <tr>
+      <br/>
+      {isUsd === false && <button onClick={() => dollariteks()} id='Dollar'>Muuda dollariteks</button>}
+      {isUsd === true && <button onClick={() => eurodeks()} id='Dollar'>Muuda eurodeks</button>}
+      <table>
+        <tr>
             <th>Id</th>
             <th>Name</th>
             <th>Price</th>
@@ -92,16 +93,19 @@ function App() {
             <th>Delete</th>
             <th>Buy</th>
           </tr>
-          
+      {products.map((product, index) => 
+          <tr>
           <td>{product.id}</td>
           <td>{product.name}</td>
           <td>{product.price.toFixed(2)}</td>
           <td>{product.stock}</td>
           <td>{product.categoryId}</td>
           <td>{product.image}</td>
-          <td><button onClick={() => kustuta(index)}>x</button></td>
-          <td><button onClick={() => tellida(product.price.toFixed(2))}>Pay</button></td>
-        </table>)}
+          <td><button onClick={() => kustuta(index)} id='X'>x</button></td>
+          <td><button onClick={() => tellida(product.price.toFixed(2), index)} id='Pay'>Pay</button></td>
+          </tr>
+        )}
+        </table>
     </div>
   );
 }
